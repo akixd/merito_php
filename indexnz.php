@@ -30,13 +30,11 @@
     <input type="submit" value="Submit">
 </form>
 
-
-
-//baza danych pracownikow - imie, nazwisko, wiek, placa
-7 rekordó
-wypisac tabelke
-
-mozzliwoscc wyszukanai nazwiska za teblicy z wyswietlenie
+<form method="get">
+    <label for="search">Szukaj po nazwisku:</label>
+    <input type="text" name="search" id="search">
+    <input type="submit" value="Szukaj">
+</form>
 
 <?php
 
@@ -54,10 +52,15 @@ if (isset($_GET['login']) && isset($_GET['country'])) {
 }
 
 
-$tab[0][0]='Jan';
-$tab[0][1]='Kowalski';
-$tab[0][2]= 20;
-$tab[0][3]= 3500;
+$tab = [
+    ['Jan', 'Kowalski', 20, 3500],
+    ['Anna', 'Nowak', 25, 4200],
+    ['Piotr', 'Zieliński', 30, 5100],
+    ['Kasia', 'Wiśniewska', 28, 3900],
+    ['Tomasz', 'Dąbrowski', 35, 6000],
+    ['Magda', 'Krawczyk', 22, 3100],
+    ['Paweł', 'Wójcik', 40, 7200],
+];
 
 echo "<table border='1'>";
 echo "
@@ -66,12 +69,30 @@ echo "
     <th>Nazwisko</th>
     <th>Wiek</th>
     <th>Wynagrodzenie</th>
-</tr>";
+</tr>
+";
 
-echo $tab[0][0] . "<br>";
-echo $tab[0][1] . "<br>"; 
-echo $tab[0][2] . "<br>"; 
-echo $tab[0][3] . "<br>"; 
+$filteredTab = $tab;
+
+if (isset($_GET['search']) && $_GET['search'] !== '') {
+    $searchTerm = strtolower(trim($_GET['search']));
+    $filteredTab = array_filter($tab, function ($row) use ($searchTerm) {
+        return strpos(strtolower($row[1]), $searchTerm) !== false;
+    });
+}
+
+foreach ($filteredTab as $row) {
+    echo "<tr>";
+    foreach ($row as $cell) {
+        echo "<td>$cell</td>";
+    }
+    echo "</tr>";
+}
+echo "</table>";
+
+if (isset($_GET['search']) && empty($filteredTab)) {
+    echo "<p>Brak wyników dla nazwiska: <strong>" . htmlspecialchars($_GET['search']) . "</strong></p>";
+}
 ?>
 
 
